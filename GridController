@@ -8,6 +8,7 @@ public class GridController : MonoBehaviour {
     Vector2[] tempSideBubbles = new Vector2[10];
     Vector2[] bubblesToPop = new Vector2[10];
     int numOfBubbles = 0;
+    int numToIncrementX = 0;
     int initialValX = 0, initialValY = 0;
 
     public void CheckGrid()
@@ -23,8 +24,9 @@ public class GridController : MonoBehaviour {
                 numOfBubbles++;
                 initialValX = x + 1;
                 initialValY = y + 1;
-                x = CheckNextBubble(currentBubbleVal, x, y, 0);
-
+                CheckNextBubble(currentBubbleVal, x, y, 0, true);
+                x += numToIncrementX;
+                numToIncrementX = 0;
                 //Create two functions, a vertical check and a horizontal check.
                 //After horizontal check is complete, store number of horizontal bubbles popped
                 //Go through each bubble checked and check both top and bottom bubbles.
@@ -34,7 +36,7 @@ public class GridController : MonoBehaviour {
         }
     }
 
-    int CheckNextBubble(int currentBubbleVal, int currentX, int currentY, int loopNum)
+    void CheckNextBubble(int currentBubbleVal, int currentX, int currentY, int loopNum, bool firstLoop)
     {
         if(currentX + 1 < BubbleData.GridWidth)
         {
@@ -42,8 +44,16 @@ public class GridController : MonoBehaviour {
             {
                 numOfBubbles++;
                 connectedBubbles[loopNum + 1] = new Vector2(currentX + 1, currentY);
-                CheckNextBubble(currentBubbleVal, currentX + 1, currentY, loopNum + 1);
-                return currentX + 1;
+                if (firstLoop)
+                {
+                    CheckNextBubble(currentBubbleVal, currentX + 1, currentY, loopNum + 1, true);
+                    numToIncrementX++;
+                }
+                else
+                {
+                    CheckNextBubble(currentBubbleVal, currentX + 1, currentY, loopNum + 1, false);
+                }
+                
             }else if(numOfBubbles > 1)
             {
                 Debug.Log("Found string of " + numOfBubbles + " at (" + initialValX + ", " + initialValY + ")");
@@ -52,17 +62,20 @@ public class GridController : MonoBehaviour {
                     for(int i = 0; i < numOfBubbles; i++)
                     {
                         bubblesToPop[i] = connectedBubbles[i];
-                        connectedBubbles[i] = new Vector2(0,0);
+                        connectedBubbles[i] = new Vector2(0, 0);
+                        CheckVerticalBubble(bubblesToPop, 0, currentBubbleVal, numOfBubbles);
                     }
                 }
                 numOfBubbles = 0;
 
-                return currentX + 1;
+                if (firstLoop)
+                {
+                    numToIncrementX++;
+                }
             }
             else
             {
                 numOfBubbles = 0;
-                return currentX;
             }
         }
         else if (numOfBubbles > 1)
@@ -74,22 +87,35 @@ public class GridController : MonoBehaviour {
                 {
                     bubblesToPop[i] = connectedBubbles[i];
                     connectedBubbles[i] = new Vector2(0, 0);
+                    CheckVerticalBubble(bubblesToPop, 0, currentBubbleVal, numOfBubbles);
                 }
             }
             numOfBubbles = 0;
-            return currentX;
+            
         }
         else
         {
             numOfBubbles = 0;
-            return currentX;
         }
     }
 
-    void CheckVerticalBubble(Vector2[] bubblesToCheck)
+    void CheckVerticalBubble(Vector2[] bubblesToCheck, int loopNum, int currentVal, int numberOfBubbles)
     {
         //For each bubble to check, check top bubble first. If bubble is valid, add bubble to array.
         //If bubble is valid, check top bubble again and repeat until bubble is no longer valid.
         //After this, return to original bubble and check bottom bubble, and repeat a similar procedure.
+        
+        
+    }
+
+    void CheckTopBubbles(int currentVal, int currentX, int currentY, int loopNum)
+    {
+
+    }
+
+    void CheckBottomBubbles(int currentVal, int currentX, int currentY, int loopNum)
+    {
+
     }
 }
+
