@@ -1,0 +1,73 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GridCreation : MonoBehaviour {
+
+    
+    public int m_width, m_height;
+    public GameObject bubble;
+    private int[,] m_tempGrid;
+    private GridController m_gridController;
+
+    private void Start()
+    {
+        m_gridController = gameObject.GetComponent<GridController>();
+        CreateGrid(5, m_width, m_height);
+        ShowGrid();
+        m_gridController.CheckGrid();
+    }
+
+    public void ShowGrid()
+    {
+        m_tempGrid = BubbleData.TypeGrid;
+        for(int y = 0; y < m_height; y++)
+        {
+            for(int x = 0; x < m_width; x++)
+            {
+                GameObject tempBubble = Instantiate(bubble, new Vector3(x, y, 0), gameObject.transform.rotation);
+                switch (m_tempGrid[x, y])
+                {
+                    case 1:
+                        tempBubble.GetComponent<SpriteRenderer>().color = Color.yellow;
+                        break;
+                    case 2:
+                        tempBubble.GetComponent<SpriteRenderer>().color = Color.blue;
+                        break;
+                    case 3:
+                        tempBubble.GetComponent<SpriteRenderer>().color = Color.red;
+                        break;
+                    case 4:
+                        tempBubble.GetComponent<SpriteRenderer>().color = Color.green;
+                        break;
+                    case 5:
+                        tempBubble.GetComponent<SpriteRenderer>().color = Color.cyan;
+                        break;
+               
+                }
+                
+
+            }
+        }
+    }
+
+    public void CreateGrid(int NumberOfTypes, int Width, int Height)
+    {
+        m_tempGrid = new int[Width, Height];
+        BubbleData.GridWidth = Width;
+        BubbleData.GridHeight = Height;
+        
+        for (int y = 0; y < m_height; y++)
+        {
+            for(int x = 0; x < m_width; x++)
+            {
+                m_tempGrid[x, y] = Random.Range(1, NumberOfTypes);
+            }
+        }
+
+        BubbleData.TypeGrid = m_tempGrid;
+    }
+	
+	
+
+}
