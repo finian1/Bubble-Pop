@@ -2,72 +2,94 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridCreation : MonoBehaviour {
+public class GridController : MonoBehaviour {
 
-    
-    public int m_width, m_height;
-    public GameObject bubble;
-    private int[,] m_tempGrid;
-    private GridController m_gridController;
+    Vector2[] connectedBubbles = new Vector2[10];
+    Vector2[] tempSideBubbles = new Vector2[10];
+    Vector2[] bubblesToPop = new Vector2[10];
+    int numOfBubbles = 0;
+    int initialValX = 0, initialValY = 0;
 
-    private void Start()
+    public void CheckGrid()
     {
-        m_gridController = gameObject.GetComponent<GridController>();
-        CreateGrid(5, m_width, m_height);
-        ShowGrid();
-        m_gridController.CheckGrid();
-    }
-
-    public void ShowGrid()
-    {
-        m_tempGrid = BubbleData.TypeGrid;
-        for(int y = 0; y < m_height; y++)
-        {
-            for(int x = 0; x < m_width; x++)
-            {
-                GameObject tempBubble = Instantiate(bubble, new Vector3(x, y, 0), gameObject.transform.rotation);
-                switch (m_tempGrid[x, y])
-                {
-                    case 1:
-                        tempBubble.GetComponent<SpriteRenderer>().color = Color.yellow;
-                        break;
-                    case 2:
-                        tempBubble.GetComponent<SpriteRenderer>().color = Color.blue;
-                        break;
-                    case 3:
-                        tempBubble.GetComponent<SpriteRenderer>().color = Color.red;
-                        break;
-                    case 4:
-                        tempBubble.GetComponent<SpriteRenderer>().color = Color.green;
-                        break;
-                    case 5:
-                        tempBubble.GetComponent<SpriteRenderer>().color = Color.cyan;
-                        break;
-               
-                }
-                
-
-            }
-        }
-    }
-
-    public void CreateGrid(int NumberOfTypes, int Width, int Height)
-    {
-        m_tempGrid = new int[Width, Height];
-        BubbleData.GridWidth = Width;
-        BubbleData.GridHeight = Height;
+        int currentBubbleVal = 0;
         
-        for (int y = 0; y < m_height; y++)
+        for (int y = 0; y < BubbleData.GridHeight; y++)
         {
-            for(int x = 0; x < m_width; x++)
+            for (int x = 0; x < BubbleData.GridWidth; x++)
             {
-                m_tempGrid[x, y] = Random.Range(1, NumberOfTypes);
+                currentBubbleVal = BubbleData.TypeGrid[x, y];
+                connectedBubbles[0] = new Vector2(x, y);
+                numOfBubbles++;
+                initialValX = x + 1;
+                initialValY = y + 1;
+                x = CheckNextBubble(currentBubbleVal, x, y, 0);
+
+                //Create two functions, a vertical check and a horizontal check.
+                //After horizontal check is complete, store number of horizontal bubbles popped
+                //Go through each bubble checked and check both top and bottom bubbles.
+                //If there are top and bottom bubbles checked, perform horizontal check on those bubbles
+                //Add bubbles to pop array only if there are 3 or more bubbles in a row.
             }
         }
-
-        BubbleData.TypeGrid = m_tempGrid;
     }
-	
-	
 
+    int CheckNextBubble(int currentBubbleVal, int currentX, int currentY, int loopNum)
+    {
+        if(currentX + 1 < BubbleData.GridWidth)
+        {
+            if(BubbleData.TypeGrid[currentX + 1, currentY] == currentBubbleVal)
+            {
+                numOfBubbles++;
+                connectedBubbles[loopNum + 1] = new Vector2(currentX + 1, currentY);
+                CheckNextBubble(currentBubbleVal, currentX + 1, currentY, loopNum + 1);
+                return currentX + 1;
+            }else if(numOfBubbles > 1)
+            {
+                Debug.Log("Found string of " + numOfBubbles + " at (" + initialValX + ", " + initialValY + ")");
+                if(numOfBubbles >= 3)
+                {
+                    for(int i = 0; i < numOfBubbles; i++)
+                    {
+                        bubblesToPop[i] = connectedBubbles[i];
+                        connectedBubbles[i] = new Vector2(0,0);
+                    }
+                }
+                numOfBubbles = 0;
+
+                return currentX + 1;
+            }
+            else
+            {
+                numOfBubbles = 0;
+                return currentX;
+            }
+        }
+        else if (numOfBubbles > 1)
+        {
+            Debug.Log("Found string of " + numOfBubbles + " at (" + initialValX + ", " + initialValY + ")");
+            if (numOfBubbles >= 3)
+            {
+                for (int i = 0; i < numOfBubbles; i++)
+                {
+                    bubblesToPop[i] = connectedBubbles[i];
+                    connectedBubbles[i] = new Vector2(0, 0);
+                }
+            }
+            numOfBubbles = 0;
+            return currentX;
+        }
+        else
+        {
+            numOfBubbles = 0;
+            return currentX;
+        }
+    }
+
+    void CheckVerticalBubble(Vector2[] bubblesToCheck)
+    {
+        //For each bubble to check, check top bubble first. If bubble is valid, add bubble to array.
+        //If bubble is valid, check top bubble again and repeat until bubble is no longer valid.
+        //After this, return to original bubble and check bottom bubble, and repeat a similar procedure.
+    }
 }
