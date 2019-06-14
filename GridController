@@ -24,6 +24,12 @@ public class GridController : MonoBehaviour {
                 initialValX = x + 1;
                 initialValY = y + 1;
                 x = CheckNextBubble(currentBubbleVal, x, y, 0);
+
+                //Create two functions, a vertical check and a horizontal check.
+                //After horizontal check is complete, store number of horizontal bubbles popped
+                //Go through each bubble checked and check both top and bottom bubbles.
+                //If there are top and bottom bubbles checked, perform horizontal check on those bubbles
+                //Add bubbles to pop array only if there are 3 or more bubbles in a row.
             }
         }
     }
@@ -80,8 +86,10 @@ public class GridController : MonoBehaviour {
         }
     }
 
-    void CheckVerticalBubble()
+    void CheckVerticalBubble(Vector2[] bubblesToCheck)
     {
-
+        //For each bubble to check, check top bubble first. If bubble is valid, add bubble to array.
+        //If bubble is valid, check top bubble again and repeat until bubble is no longer valid.
+        //After this, return to original bubble and check bottom bubble, and repeat a similar procedure.
     }
 }
